@@ -210,7 +210,7 @@ class TaskManagementController extends Controller
             ]);
 
             $user = User::where('id', $request["user_id"])->first();
-            if( !$user) return response()->json($data = "Not found user", $status = 200);
+            if (!$user) return response()->json($data = "Not found user", $status = 200);
             if ($user['group'] != 0) {
                 return response()->json($data = "You are not Admin", $status = 200);
             }
@@ -228,15 +228,12 @@ class TaskManagementController extends Controller
     {
         try {
 
-            $request->validate([
-                "task_id" => "required",
-                "dealine" => "required| date_format:Y-m-d",
-                "user_id" => "required",
-            ]);
-
-            // project::where
-
-            return response()->json($data = "Update dealine successfull", $status = 200);
+            $projects = project::get();
+            foreach ($projects as $item) {
+                $item->task;
+            }
+            //  $projects->task;
+            return response()->json($data = ['project' => $projects], $status = 200);
         } catch (\Exception $error) {
             return $error;
         }

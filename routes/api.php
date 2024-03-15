@@ -26,6 +26,8 @@ Route::post('/user/login', [UserController::class, 'login']);
 
 Route::post('project/add', [TaskManagementController::class, 'addproject']);
 Route::post('project/addtask', [TaskManagementController::class, 'addTask']);
+Route::get('project/get', [TaskManagementController::class, 'getProject']);
+
 Route::post('status/add', [TaskManagementController::class, 'addStatus']);
 
 
@@ -46,7 +48,9 @@ Route::post('/task/addworker', [TaskManagementController::class, 'addUserInProje
 Route::post('/task/updatestatus', [TaskManagementController::class, 'editStatusTask']);
 Route::post('/task/updatepermission', [TaskManagementController::class, 'editPermission']);
 Route::post('/task/updatedealine', [TaskManagementController::class, 'editDealine']);
-;
+
+
+
 
 
 
@@ -56,3 +60,5 @@ Route::post('/task/updatedealine', [TaskManagementController::class, 'editDealin
 // add maorings
 
 Route::post('/majoring/add', [UserController::class, 'addMajoring']);
+Route::get('/majoring/get', [UserController::class, 'getMajoring']);
+

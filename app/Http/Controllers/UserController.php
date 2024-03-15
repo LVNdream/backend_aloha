@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\user_infor;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class UserController extends BaseController
@@ -102,19 +103,27 @@ class UserController extends BaseController
 
             $user = User::where('email', $request['email'])->first();
 
-            if (!$user)  return response()->json($data = 'Email not valid', $status = 200);
+            if (!$user)  return response()->json($data = ['mess'=>'Email not valid'], $status = 200);
 
             $token = JWTAuth::attempt([
                 "email" => $request['email'],
                 "password" => $request['password'],
             ]);
 
-            if (empty($token)) return response()->json([
-                "status" => false,
-                "message" => "Login faild"
-            ]);
+            if (empty($token)) return response()->json(
+                $data = 'Login faild',
+                $status = 401
+            );
 
-            return $this->respondWithToken($token);
+            $user_infor= auth()->user();
+            return
+                response()->json($data = [
+                    'mess'=>"Login successful",
+                    'access_token' => $token,
+                    'user_infor' =>$user_infor,
+                    'token_type' => 'bearer',
+                    'expires_in' => Auth::factory()->getTTL() * 60
+                ], $status = 200);
         } catch (\Exception $err) {
             return $err;
         }
@@ -137,9 +146,9 @@ class UserController extends BaseController
         auth()->logout();
 
         return response()->json([
-            'status'=>true,
+            'status' => true,
             'message' => 'Successfully logged out',
-            
+
         ]);
     }
 
@@ -152,13 +161,27 @@ class UserController extends BaseController
 
     protected function respondWithToken($token)
     {
-        return response()->json([
+        return response()->json($data = [
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => Auth::factory()->getTTL() * 60
-        ]);
+        ], $status = 200);
     }
 
+
+    public function getMajoring()
+    {
+        try {
+
+            $majorings = majoring::get();
+            return response()->json(
+                $majorings,
+                200
+            );
+        } catch (\Exception $error) {
+            return ($error);
+        }
+    }
 
     public function addMajoring(Request $request)
     {
