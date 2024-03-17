@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\majoring;
 use App\Models\majorings;
+use App\Models\status;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
@@ -103,7 +104,7 @@ class UserController extends BaseController
 
             $user = User::where('email', $request['email'])->first();
 
-            if (!$user)  return response()->json($data = ['mess'=>'Email not valid'], $status = 200);
+            if (!$user)  return response()->json($data = ['mess' => 'Email not valid'], $status = 201);
 
             $token = JWTAuth::attempt([
                 "email" => $request['email'],
@@ -111,16 +112,17 @@ class UserController extends BaseController
             ]);
 
             if (empty($token)) return response()->json(
-                $data = 'Login faild',
-                $status = 401
+                $data = ['mess' => 'Password not valid'],
+                $status = 201
             );
 
-            $user_infor= auth()->user();
+            $user = auth()->user();
+            $user->user_infor;
             return
                 response()->json($data = [
-                    'mess'=>"Login successful",
+                    'mess' => "Login successful",
                     'access_token' => $token,
-                    'user_infor' =>$user_infor,
+                    'user' => $user,
                     'token_type' => 'bearer',
                     'expires_in' => Auth::factory()->getTTL() * 60
                 ], $status = 200);
@@ -149,7 +151,7 @@ class UserController extends BaseController
             'status' => true,
             'message' => 'Successfully logged out',
 
-        ]);
+        ], 200);
     }
 
 
@@ -157,8 +159,6 @@ class UserController extends BaseController
     {
         return $this->respondWithToken(Auth::refresh());
     }
-
-
     protected function respondWithToken($token)
     {
         return response()->json($data = [
@@ -176,6 +176,41 @@ class UserController extends BaseController
             $majorings = majoring::get();
             return response()->json(
                 $majorings,
+                200
+            );
+        } catch (\Exception $error) {
+            return ($error);
+        }
+    }
+
+    public function getStatus()
+    {
+        try {
+
+            $status = status::get();
+            return response()->json(
+                $status,
+                200
+            );
+        } catch (\Exception $error) {
+            return ($error);
+        }
+    }
+
+
+    public function getUserByMajoring(Request $request, string $majoring_id)
+    {
+        try {
+            // return $request;
+            // return $majoring_id;
+
+            $users = user_infor::where('majoring_id', $majoring_id)->get();
+
+            foreach ($users as $item) {
+                $item->user;
+            }
+            return response()->json(
+                $users,
                 200
             );
         } catch (\Exception $error) {

@@ -25,6 +25,6 @@ class worker extends Model
 
     public function task(): BelongsTo
     {
-        return $this->belongsTo(task::class);
+        return $this->belongsTo(task::class,"task_id");
     }
 }

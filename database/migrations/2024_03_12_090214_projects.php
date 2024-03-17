@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('user_infor_id');
             $table->string('project_name');
+            $table->longText('project_des');
+
             $table->timestamps();
         });
     }

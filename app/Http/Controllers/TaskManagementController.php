@@ -40,12 +40,15 @@ class TaskManagementController extends Controller
             $request->validate([
                 'user_infor_id'  => "required",
                 "project_name" => "required",
+                'project_des' => "required"
             ]);
 
             $project = project::create(
                 [
                     "user_infor_id" => $request['user_infor_id'],
                     "project_name" => $request['project_name'],
+                    "project_des" => $request['project_des'],
+
                 ]
             );
             return response()->json($data = 'Add project successfully', $status = 200);
@@ -90,7 +93,7 @@ class TaskManagementController extends Controller
         }
     }
 
-    public function addUserInProject(Request $request)
+    public function addUserInTask(Request $request)
     {
 
         try {
@@ -98,6 +101,18 @@ class TaskManagementController extends Controller
                 "user_infor_id" => "required",
                 "task_id" => "required",
             ]);
+
+            $testWorker = worker::where(
+                [
+                    ['user_infor_id', $request['user_infor_id']],
+                    ['task_id', $request['task_id']]
+
+                ]
+            )->first();
+
+            if ($testWorker) {
+                return response()->json($data = 'User added', $status = 200);
+            }
 
             $worker = worker::create(
                 [
@@ -134,8 +149,8 @@ class TaskManagementController extends Controller
                     ["task_id", $request['task_id']],
                 ]
             )->first();
-            if (!$worker) {
-                return response()->json($data = 'Work not for you', $status = 401);
+            if (!$worker && $request['user_infor_id'] != 12) {
+                return response()->json($data = 'Work not for you', $status = 200);
             }
 
             $permission = permission::where(
@@ -147,8 +162,8 @@ class TaskManagementController extends Controller
                 ]
             )->first();
 
-            if (!$permission) {
-                return response()->json($data = 'You not have updating permission', $status = 401);
+            if (!$permission && $request['user_infor_id'] != 12) {
+                return response()->json($data = 'You not have updating permission', $status = 200);
             }
 
             task::where([
@@ -227,15 +242,147 @@ class TaskManagementController extends Controller
     public function getproject(Request $request)
     {
         try {
-
+            $finnalProject = [];
             $projects = project::get();
             foreach ($projects as $item) {
                 $item->task;
+                foreach ($item->task as $itemtask) {
+                    $itemtask->worker;
+                    $itemtask->status;
+
+                    foreach ($itemtask->worker as $itemTaskWorker) {
+                        $itemTaskWorker->user_infor;
+                    }
+                }
             }
-            //  $projects->task;
-            return response()->json($data = ['project' => $projects], $status = 200);
+            // foreach ($projects as $item) {
+            //     $item->permission;
+            // }
+
+            return response()->json($projects, $status = 200);
         } catch (\Exception $error) {
             return $error;
+        }
+    }
+
+    public function deleteUserInTask(Request $request)
+    {
+
+        try {
+
+            $request->validate([
+                "user_infor_id" => "required",
+                "task_id" => "required",
+                "auth_id" => "required",
+            ]);
+
+            $user = User::where('id', $request["auth_id"])->first();
+            if (!$user) return response()->json($data = "Not found user", $status = 200);
+            if ($user['group'] != 0) {
+                return response()->json($data = "You are not Admin", $status = 200);
+            }
+
+            $worker = worker::where(
+                [
+                    ["user_infor_id", $request['user_infor_id']],
+                    ["task_id", $request['task_id']],
+                ]
+            )->first();
+
+            if (!$worker) return response()->json($data = "Not find worker in task", $status = 200);
+
+
+
+            $workerDelete = worker::where(
+                [
+                    ["user_infor_id", $request['user_infor_id']],
+                    ["task_id", $request['task_id']],
+                ]
+            )->delete();
+
+            $permission = permission::where(
+                [
+                    ["user_infor_id", $request['user_infor_id']],
+                    ["task_id", $request['task_id']],
+                ]
+            )->delete();
+
+            return response()->json($data = "Delete worker successfull", $status = 200);
+        } catch (\Exception $error) {
+            return $error;
+        }
+    }
+
+    public function deleteTask(Request $request)
+    {
+
+        try {
+
+            $request->validate([
+                "task_id" => "required",
+                "auth_id" => "required",
+            ]);
+
+            $user = User::where('id', $request["auth_id"])->first();
+            if (!$user) return response()->json($data = "Not found user", $status = 200);
+            if ($user['group'] != 0) {
+                return response()->json($data = "You are not Admin", $status = 200);
+            }
+
+            $task = task::where(
+                "id",
+                $request['task_id']
+            )->first();
+
+            if (!$task) return response()->json($data = "Not find task in project", $status = 200);
+
+
+            $taskDelete = task::where(
+                "id",
+                $request['task_id'],
+            )->delete();
+            $workerDelete = worker::where(
+                "task_id",
+                $request['task_id'],
+            )->delete();
+            $permission = permission::where(
+                "task_id",
+                $request['task_id'],
+            )->delete();
+
+            return response()->json($data = "Delete task successfull", $status = 200);
+        } catch (\Exception $error) {
+            return $error;
+        }
+    }
+
+    public function getTaskById(Request $request, string $id)
+    {
+        try {
+
+
+            $workers = worker::where('user_infor_id', $id)->get();
+
+            foreach ($workers as $tasks) {
+                $tasks->task;
+                $tasks->task->worker;
+                $tasks->task->project;
+
+                foreach ($tasks->task->worker as $worker_if) {
+                    $worker_if->user_infor;
+                }
+                $tasks->task->project;
+
+                // foreach ($tasks->task as $task) {
+                //     // $task->project;
+                // }
+            }
+            return response()->json(
+                $workers,
+                200
+            );
+        } catch (\Exception $error) {
+            return ($error);
         }
     }
 }

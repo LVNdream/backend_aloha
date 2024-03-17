@@ -34,7 +34,7 @@ class task extends Model
 
     public function worker(): HasMany
     {
-        return $this->hasMany(worker::class);
+        return $this->hasMany(worker::class,'task_id');
     }
 
     public function project(): BelongsTo

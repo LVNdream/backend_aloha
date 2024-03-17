@@ -17,7 +17,8 @@ class project extends Model
 
     protected $fillable = [
         'user_infor_id',
-        'project_name'
+        'project_name',
+        'project_des'
     ];
 
     public function user_infor(): BelongsTo
