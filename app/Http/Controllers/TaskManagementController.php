@@ -7,6 +7,7 @@ use App\Models\project;
 use App\Models\status;
 use App\Models\task;
 use App\Models\User;
+use App\Models\user_infor;
 use App\Models\worker;
 use Illuminate\Http\Request;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -163,7 +164,7 @@ class TaskManagementController extends Controller
             )->first();
 
             if (!$permission && $request['user_infor_id'] != 12) {
-                return response()->json($data = 'You not have updating permission', $status = 200);
+                return response()->json($data = 'You do not have updating permission', $status = 200);
             }
 
             task::where([
@@ -379,6 +380,38 @@ class TaskManagementController extends Controller
             }
             return response()->json(
                 $workers,
+                200
+            );
+        } catch (\Exception $error) {
+            return ($error);
+        }
+    }
+
+    public function getUserManagemnet(Request $request)
+    {
+        try {
+
+
+            $users = user_infor::get();
+
+            foreach ($users as $user) {
+                $user->user;
+
+                $user->majoring;
+                $user->worker;
+
+
+                foreach ($user->worker as $worker) {
+                    $worker->task->status;
+                    $worker->task->project;
+                }
+
+                // foreach ($tasks->task as $task) {
+                //     // $task->project;
+                // }
+            }
+            return response()->json(
+                $users,
                 200
             );
         } catch (\Exception $error) {

@@ -26,7 +26,7 @@ class user_infor extends Model
 
     public function majoring(): BelongsTo
     {
-        return $this->belongsTo(user_infor::class,'majoring_id');
+        return $this->belongsTo(majoring::class);
     }
 
     public function User(): BelongsTo

@@ -19,6 +19,6 @@ class majoring extends Model
 
     public function user_infor(): HasMany
     {
-        return $this->hasMany(user_infor::class,"majoring_id");
+        return $this->hasMany(user_infor::class);
     }
 }

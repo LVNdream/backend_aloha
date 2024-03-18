@@ -32,6 +32,8 @@ Route::get('/status/get', [UserController::class, 'getStatus']);
 
 Route::get('user/getbymajoring/{majoring_id}', [UserController::class, 'getUserByMajoring']);
 Route::get('mytask/{id}', [TaskManagementController::class, 'getTaskById']);
+Route::get('management', [TaskManagementController::class, 'getUserManagemnet']);
+
 
 
 
