@@ -150,7 +150,7 @@ class TaskManagementController extends Controller
                     ["task_id", $request['task_id']],
                 ]
             )->first();
-            if (!$worker && $request['user_infor_id'] != 12) {
+            if (!$worker && $request['user_infor_id'] != 9) {
                 return response()->json($data = 'Work not for you', $status = 200);
             }
 
@@ -163,7 +163,7 @@ class TaskManagementController extends Controller
                 ]
             )->first();
 
-            if (!$permission && $request['user_infor_id'] != 12) {
+            if (!$permission && $request['user_infor_id'] != 9) {
                 return response()->json($data = 'You do not have updating permission', $status = 200);
             }
 
