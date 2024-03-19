@@ -19,10 +19,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 class UserController extends BaseController
 {
 
-    // public function __construct()
-    // {
-    //     $this->middleware('auth:api', ['except' => ['login', 'logout']]);
-    // }
+    
     //  ham xu li add user
     public function addUser(Request $request)
     {
@@ -64,38 +61,10 @@ class UserController extends BaseController
     }
 
 
-
-    // public function signin(Request $request)
-    // {
-    //     try{
-    //         $request->validate([
-    //             "email"=>"required| email:rfc,dns",
-    //             "password" => "required",
-    //         ]);
-
-    //     $user = User::where('email',$request['email'])->first();
-
-    //         if(!$user)  return response()->json($data = 'Email not valid', $status = 200);
-
-    //         if (!(Hash::check($request['password'], $user['password']))) return response()->json($data = 'Password not valid', $status = 200);
-
-    //         return response()->json($data = 'Login successfully', $status = 200);
-    //     }
-    //     catch(\Exception $e){
-    //         return $e;
-    //     }
-    // }
-
-
-
     public function login(Request $request)
     {
         try {
-            // $credentials = request(['email', 'password']);
-
-            // if (! $token = auth()->attempt($credentials)) {
-            //     return response()->json(['error' => 'Unauthorized'], 401);
-            // }
+            
 
             $request->validate([
                 "email" => "required|email",
